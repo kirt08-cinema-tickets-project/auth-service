@@ -7,13 +7,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.core.config import settings
 from src.core.db import db
 
-from src.apps.schemas import UserRequest, UserResponse
-from src.apps.service import (
+from src.apps.auth.schemas import UserRequest, UserResponse
+from src.apps.auth.service import (
     service_create_user, 
     service_find_user_by_phone, 
     service_find_user_by_email
 )
-from src.apps.exceptions import UserAlreadyExistsException
+from src.apps.auth.exceptions import UserAlreadyExistsException
 
 log = logging.getLogger(__name__)
 logging.basicConfig(
@@ -21,7 +21,7 @@ logging.basicConfig(
     level=settings.logger.log_level,
 )
 
-router = APIRouter(prefix="/auth")
+router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/create", response_model = UserResponse)
 async def create_user(

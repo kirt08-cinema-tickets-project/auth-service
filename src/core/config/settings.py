@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from src.core.config.dbConfig import DatabaseConfig
 from src.core.config.loggerConfig import LoggerConfig
+from src.core.config.redisConfig import RedisConfig
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
@@ -17,5 +18,6 @@ class Settings(BaseSettings):
     )
     db : DatabaseConfig = DatabaseConfig()
     logger : LoggerConfig = LoggerConfig()
+    redis_db : RedisConfig = RedisConfig()
 
 settings = Settings()

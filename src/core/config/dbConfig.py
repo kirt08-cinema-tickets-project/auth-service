@@ -3,11 +3,11 @@ from sqlalchemy import URL
 
 
 class DatabaseConfig(BaseModel):
-    username : str = "test"
-    password : SecretStr = "test"
-    host : str = "test"
-    port : str = "test"
-    name : str = "test"
+    username : str = "posgres"
+    password : SecretStr = "1111"
+    host : str = "localhost"
+    port : str = "5432"
+    name : str = "postgres"
 
     echo : bool = True
 

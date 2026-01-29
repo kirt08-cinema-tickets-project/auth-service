@@ -1,9 +1,9 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.apps.models import UsersORM
-from src.apps.schemas import UserResponse, UserRequest
-from src.apps.exceptions import UserAlreadyExistsException
+from src.apps.auth.models import UsersORM
+from src.apps.auth.schemas import UserResponse, UserRequest
+from src.apps.auth.exceptions import UserAlreadyExistsException
 
 async def service_find_user_by_phone(
     phone : str,
