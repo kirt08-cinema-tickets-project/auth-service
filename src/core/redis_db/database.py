@@ -35,5 +35,6 @@ class RedisService:
     async def delete(self, key : str) -> bool:
         return bool(await self._client.delete(key))
     
-def get_redis(redis_client : redis.Redis = Depends(get_redis_client)) -> RedisService:
-    return RedisService(redis_client)
+async def get_redis() -> RedisService:
+    client = get_redis_client()
+    return RedisService(client)
