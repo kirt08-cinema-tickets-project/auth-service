@@ -5,6 +5,8 @@ from src.apps.auth.models import UsersORM
 from src.apps.auth.schemas import UserResponse, UserRequest
 from src.apps.auth.exceptions import UserAlreadyExistsException
 
+from src.apps.otp.router import Otp
+
 async def service_find_user_by_phone(
     phone : str,
     session : AsyncSession,
@@ -49,5 +51,26 @@ async def service_create_user(
     await session.commit()
     await session.refresh(user)
     return user
+
+async def service_update_verified_field(identifier: str, type_: str, session : AsyncSession) -> None:
+    """
+    Update field 'is_phone_verified' or 'is_email_verified' depending on type_
+    """
+    if type_ == "phone":
+        user_orm = ( await session.execute(
+            select(UsersORM)
+            .filter_by(phone = identifier)
+        )).scalar_one()
+        user_orm.is_phone_verified = True
+        session.add(user_orm)
+        await session.commit()
+    else:
+        user_orm = ( await session.execute(
+            select(UsersORM)
+            .filter_by(email = identifier)
+        )).scalar_one()
+        user_orm.is_email_verified = True
+        session.add(user_orm)
+        await session.commit()
 
     

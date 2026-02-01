@@ -1,5 +1,9 @@
+from contextlib import asynccontextmanager
+
+from typing import AsyncIterator
+
 from sqlalchemy import URL
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 
 from src.core.db.models import Base
 from src.core.config import settings
@@ -34,7 +38,8 @@ class DataBase:
         async with self.engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
 
-    async def get_db(self):
+    @asynccontextmanager
+    async def session(self) -> AsyncIterator[AsyncSession]:
         async with self.sessionmaker() as session:
             yield session
 
