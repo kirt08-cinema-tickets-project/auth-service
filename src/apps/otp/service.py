@@ -5,6 +5,7 @@ import hmac
 
 from src.core.redis_db import RedisService
 from src.core.config import settings
+from src.core.utils import token
 
 from src.apps.otp.exceptions import (
     IncorrectCodeException,
@@ -22,7 +23,7 @@ def service_generate_code() -> tuple[str, str]:
     hashed_code : str = hashlib.sha256(code.encode()).hexdigest()
     return (code, hashed_code)
 
-async def service_verify_otp(identifier : str, type_ : str, code : str, redis : RedisService) -> dict[str, str]:
+async def service_verify_otp(identifier : str, type_ : str, code : str, payload : str, redis : RedisService) -> dict[str, str]:
     key = "otp:" + str(type_) + ":" + str(identifier)
     hashed_real_code: bytes = await redis.get(key)
 
@@ -36,15 +37,15 @@ async def service_verify_otp(identifier : str, type_ : str, code : str, redis : 
     if not res:
         raise IncorrectCodeException
 
-    access_token = await service_generate_access_token()
-    refresh_token = await service_generate_refresh_token()
+    access_token = await service_generate_access_token(payload)
+    refresh_token = await service_generate_refresh_token(payload)
     return {
         "access_token": access_token,
         "refresh_token": refresh_token,
     }
 
-async def service_generate_access_token():
-    return "1"
+async def service_generate_access_token(payload: str):
+    return token.generate_token(str(payload), settings.passport.access_ttl)
 
-async def service_generate_refresh_token():
-    return "1"
+async def service_generate_refresh_token(payload: str):
+    return token.generate_token(str(payload), settings.passport.refresh_ttl)

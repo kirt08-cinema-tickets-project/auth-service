@@ -64,6 +64,7 @@ async def service_update_verified_field(identifier: str, type_: str, session : A
         user_orm.is_phone_verified = True
         session.add(user_orm)
         await session.commit()
+        return user_orm.id
     else:
         user_orm = ( await session.execute(
             select(UsersORM)
@@ -72,5 +73,6 @@ async def service_update_verified_field(identifier: str, type_: str, session : A
         user_orm.is_email_verified = True
         session.add(user_orm)
         await session.commit()
+        return user_orm.id
 
     

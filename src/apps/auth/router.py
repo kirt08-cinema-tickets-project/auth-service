@@ -10,11 +10,9 @@ from src.apps.auth.service import (
     service_create_user,
     service_update_verified_field,
 )
-from src.apps.auth.exceptions import (
-    UserAlreadyExistsException,
-)
+
 from src.apps.auth.schemas import (
-    UserRequest
+    UserRequest,
 )
 
 log = logging.getLogger(__name__)
@@ -41,11 +39,11 @@ class Auth:
 
 
     async def verifyOtp(identifier : str, type_ : str, code : str) -> dict[str, str]:
-        redis = await get_redis()
-        res = await Otp.verify_otp(identifier, type_, code, redis)
-
         async with db.session() as session:
-            await service_update_verified_field(identifier, type_, session)
+            user_id = await service_update_verified_field(identifier, type_, session)
         
+        redis = await get_redis()
+        res = await Otp.verify_otp(identifier, type_, code, user_id, redis)
+
         return res
         

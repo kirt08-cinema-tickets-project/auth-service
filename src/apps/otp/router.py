@@ -41,10 +41,11 @@ class Otp:
         identifier : str,
         type_ : str,
         code : str,
+        payload : str,
         redis : RedisService,
     ) -> dict[str, str]:
         try:
-            res = await service_verify_otp(identifier, type_, code, redis)
+            res = await service_verify_otp(identifier, type_, code, payload, redis)
             return res
         except IncorrectCodeException:
             log.error("incorrect code")

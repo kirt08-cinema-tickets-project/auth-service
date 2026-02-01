@@ -430,6 +430,18 @@ grpcio-tools = ">=1.76.0,<2.0.0"
 protobuf = ">=6.33.4,<7.0.0"
 
 [[package]]
+name = "kirt08-tokens"
+version = "0.1.0"
+description = "This lib will help you generate token for your projects."
+optional = false
+python-versions = ">=3.12"
+groups = ["main"]
+files = [
+    {file = "kirt08_tokens-0.1.0-py3-none-any.whl", hash = "sha256:8f3f827440e1e8b536d5a18b5c9c85903771c8cf5be5190f1f3b453601e56256"},
+    {file = "kirt08_tokens-0.1.0.tar.gz", hash = "sha256:c96f080d79a40d4a97b2ce6ccb911e36c32c070b47bf07fb4095c7bf5a09230b"},
+]
+
+[[package]]
 name = "protobuf"
 version = "6.33.5"
 description = ""
@@ -849,4 +861,4 @@ standard = ["colorama (>=0.4) ; sys_platform == \"win32\"", "httptools (>=0.6.3)
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12, <3.13"
-content-hash = "28cd3cd68115b4b87c8ccc4817da8a42b1057cfdb98dda9d971745703016da80"
+content-hash = "1f4be6403a5ee69e04d7d1fcd9a821749a9d608cc7064b433f03c087a42d3742"

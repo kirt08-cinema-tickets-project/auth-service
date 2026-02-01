@@ -13,6 +13,7 @@ dependencies = [
     "pydantic-settings (>=2.12.0,<3.0.0)",
     "redis (>=7.1.0,<8.0.0)",
     "kirt08-contracts (>=0.1.3,<0.2.0)",
+    "kirt08-tokens (>=0.1.0,<0.2.0)",
 ]
 
 
