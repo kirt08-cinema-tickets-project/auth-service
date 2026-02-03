@@ -1,11 +1,15 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.core.utils import token
+from src.core.config import settings
+
 from src.apps.auth.models import UsersORM
 from src.apps.auth.schemas import UserResponse, UserRequest
-from src.apps.auth.exceptions import UserAlreadyExistsException
-
-from src.apps.otp.router import Otp
+from src.apps.auth.exceptions import (
+    UserAlreadyExistsException,
+    TokenException,
+)
 
 async def service_find_user_by_phone(
     phone : str,
@@ -75,4 +79,12 @@ async def service_update_verified_field(identifier: str, type_: str, session : A
         await session.commit()
         return user_orm.id
 
-    
+async def service_refresh(refresh_token : str) -> dict[str, str]:
+    res : dict[bool, str] = token.verify_token(refresh_token)
+    if not res.get("valid"):
+        raise TokenException(res.get("reason"))
+    new_tokens : dict[str, str] = {
+        "access_token": token.generate_token(res.get("payload"), settings.passport.access_ttl),
+        "refresh_token": token.generate_token(res.get("payload"), settings.passport.refresh_ttl),
+    }
+    return new_tokens

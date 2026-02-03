@@ -9,6 +9,7 @@ from src.apps.otp import Otp
 from src.apps.auth.service import (
     service_create_user,
     service_update_verified_field,
+    service_refresh,
 )
 
 from src.apps.auth.schemas import (
@@ -47,3 +48,6 @@ class Auth:
 
         return res
         
+    async def refresh(refresh_token : str) -> dict[str, str]:
+        res = await service_refresh(refresh_token)
+        return res

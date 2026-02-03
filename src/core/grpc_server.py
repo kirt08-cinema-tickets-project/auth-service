@@ -6,6 +6,7 @@ from kirt08_contracts import auth_pb2, auth_pb2_grpc
 from src.apps.auth import Auth
 from src.apps.auth.exceptions import (
     UserAlreadyExistsException,
+    TokenException,
 )
 
 
@@ -65,6 +66,21 @@ class gRPC_Auth_Server:
         except Exception:
             await context.abort(grpc.StatusCode.INTERNAL, "Something went wrong...")
 
+        response.access_token = res["access_token"]
+        response.refresh_token = res["refresh_token"]
+        return response
+    
+    async def Refresh(self, request, context):
+        """
+        request.refresh_token -> {access_token, refresh_token}
+        """
+        response = auth_pb2.RefreshResponse()
+        try:
+            res : dict[str, str] = await Auth.refresh(request.refresh_token)
+        except TokenException as e:
+            await context.abort(e.grpc_status, e.message)
+        except Exception:
+            await context.abort(grpc.StatusCode.INTERNAL, "Something went wrong...")
         response.access_token = res["access_token"]
         response.refresh_token = res["refresh_token"]
         return response

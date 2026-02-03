@@ -9,3 +9,6 @@ class ServiceError(Exception):
 
 class UserAlreadyExistsException(ServiceError):
     grpc_status = grpc.StatusCode.ALREADY_EXISTS
+
+class TokenException(ServiceError):
+    grpc_status = grpc.StatusCode.UNAUTHENTICATED
