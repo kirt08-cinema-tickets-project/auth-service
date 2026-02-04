@@ -12,7 +12,7 @@ from src.apps.auth.service import (
     service_refresh,
 )
 
-from src.apps.auth.schemas import (
+from src.core.db.models.schemas import (
     UserRequest,
 )
 

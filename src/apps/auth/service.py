@@ -4,8 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.core.utils import token
 from src.core.config import settings
 
-from src.apps.auth.models import UsersORM
-from src.apps.auth.schemas import UserResponse, UserRequest
+from src.core.db.models.users import UsersORM
+from src.core.db.models.schemas import UserResponse, UserRequest
 from src.apps.auth.exceptions import (
     UserAlreadyExistsException,
     TokenException,

@@ -5,7 +5,7 @@ from typing import AsyncIterator
 from sqlalchemy import URL
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 
-from src.core.db.models import Base
+from src.core.db.models.base_models import Base
 from src.core.config import settings
 
 class DataBase:
@@ -36,6 +36,7 @@ class DataBase:
 
     async def create_tables(self):
         async with self.engine.begin() as conn:
+            await conn.run_sync(Base.metadata.drop_all)
             await conn.run_sync(Base.metadata.create_all)
 
     @asynccontextmanager
