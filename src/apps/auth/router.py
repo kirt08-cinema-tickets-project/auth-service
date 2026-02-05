@@ -1,13 +1,14 @@
 import logging
 
 from src.core.db import db
+from src.core.db.service import service_create_user
+
 from src.core.config import settings
 from src.core.redis_db import get_redis
 
 from src.apps.otp import Otp
 
 from src.apps.auth.service import (
-    service_create_user,
     service_update_verified_field,
     service_refresh,
 )
@@ -35,7 +36,6 @@ class Auth:
         redis = await get_redis()
         res = await Otp.send_otp(identifier, type_, redis)
 
-        log.info(f"user: {res}")
         return True
 
 

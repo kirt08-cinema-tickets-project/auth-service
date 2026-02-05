@@ -23,7 +23,7 @@ def service_generate_code() -> tuple[str, str]:
     hashed_code : str = hashlib.sha256(code.encode()).hexdigest()
     return (code, hashed_code)
 
-async def service_verify_otp(identifier : str, type_ : str, code : str, payload : str, redis : RedisService) -> dict[str, str]:
+async def service_verify_otp(identifier : str, type_ : str, code : str, user_id : str, redis : RedisService) -> dict[str, str]:
     key = "otp:" + str(type_) + ":" + str(identifier)
     hashed_real_code: bytes = await redis.get(key)
 
@@ -37,8 +37,8 @@ async def service_verify_otp(identifier : str, type_ : str, code : str, payload 
     if not res:
         raise IncorrectCodeException
 
-    access_token = await service_generate_access_token(payload)
-    refresh_token = await service_generate_refresh_token(payload)
+    access_token = await service_generate_access_token(user_id)
+    refresh_token = await service_generate_refresh_token(user_id)
     return {
         "access_token": access_token,
         "refresh_token": refresh_token,

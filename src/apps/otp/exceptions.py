@@ -1,17 +1,16 @@
 import grpc
 
-class ServiceError(Exception):
-    grpc_status = grpc.StatusCode.INTERNAL
+from src.core.grpc_server.exceptions import ServiceError
 
-    def __init__(self, message: str = ""):
-        super().__init__(message)
-        self.message = message
 
 class ProblemsWithRedisException(ServiceError):
     grpc_status = grpc.StatusCode.UNAVAILABLE
+    message = "Redis Error"
 
 class IncorrectCodeException(ServiceError):
     grpc_status = grpc.StatusCode.NOT_FOUND
+    message = "Incorrect code"
 
 class CodeNotFoundException(ServiceError):
     grpc_status = grpc.StatusCode.NOT_FOUND
+    message = "Code was not found"

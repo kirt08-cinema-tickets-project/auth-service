@@ -21,7 +21,7 @@ logging.basicConfig(
 )
 
 class Otp:
-    async def send_otp(identifier : str, type_ : str, redis : RedisService) -> bool:
+    async def send_otp(identifier : str, type_ : str, redis : RedisService) -> list[str]:
         code, hashed_code = service_generate_code()
         key = "otp:" + str(type_) + ":" + str(identifier)
         try:
@@ -32,7 +32,7 @@ class Otp:
                 raise ProblemsWithRedisException
             
             log.info(f"code: {code} with redis res: {res}")
-            return res
+            return [code, hashed_code]
         except:
             raise ProblemsWithRedisException
         
@@ -41,11 +41,11 @@ class Otp:
         identifier : str,
         type_ : str,
         code : str,
-        payload : str,
+        user_id : str,
         redis : RedisService,
     ) -> dict[str, str]:
         try:
-            res = await service_verify_otp(identifier, type_, code, payload, redis)
+            res = await service_verify_otp(identifier, type_, code, user_id, redis)
             return res
         except IncorrectCodeException:
             log.error("incorrect code")
