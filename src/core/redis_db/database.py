@@ -1,5 +1,4 @@
 from functools import lru_cache
-from fastapi import Depends
 import redis.asyncio as redis
 
 from src.core.config import settings

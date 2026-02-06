@@ -18,6 +18,7 @@ class UsersORM(Base):
     is_phone_verified : Mapped[bool] = mapped_column(default=False)
     is_email_verified : Mapped[bool] = mapped_column(default=False)
     role : Mapped[Roles] = mapped_column(default=Roles.USER)
+    telegram_id : Mapped[str] = mapped_column(String(256), nullable=True, unique=True)
 
     contact_changes : Mapped["PendingContactChangesORM"] = relationship(back_populates="account")
 

@@ -1,10 +1,10 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.db.exceptions import UserAlreadyExistsException
-
 from src.core.db.models.users import UsersORM
 from src.core.db.models.schemas import UserRequest, UserResponse
+
+from src.apps.shared.exceptions import UserAlreadyExistsException
 
 
 async def service_find_user_by_id(user_id : int, session : AsyncSession) -> UserResponse:

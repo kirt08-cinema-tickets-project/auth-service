@@ -5,8 +5,10 @@ from kirt08_contracts.auth import auth_pb2_grpc
 from kirt08_contracts.account import account_pb2_grpc
 
 from src.core.config import settings
+from src.core.container import init_objects
 from src.core.grpc_server.auth import gRPC_Auth_Server
 from src.core.grpc_server.account import gRPC_Account_Server
+
 
 log = logging.getLogger(name = __name__)
 logging.basicConfig(
@@ -20,15 +22,18 @@ async def serve():
     # log.info("Drop Table")
     log.info("Server starting up...")
 
+    
+    otp, auth, account, telegram = await init_objects()
+
     server = grpc.aio.server()
 
     auth_pb2_grpc.add_AuthServiceServicer_to_server(
-        gRPC_Auth_Server(),
+        gRPC_Auth_Server(auth, telegram),
         server
     )
 
     account_pb2_grpc.add_AccountServiceServicer_to_server(
-        gRPC_Account_Server(),
+        gRPC_Account_Server(account),
         server
     )
 

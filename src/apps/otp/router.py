@@ -1,7 +1,8 @@
 import logging
 
-from src.core.config import settings
 from src.core.redis_db import RedisService
+
+from src.apps.shared.exceptions import ProblemsWithRedisException
 
 from src.apps.otp.service import (
     service_generate_code,
@@ -9,23 +10,22 @@ from src.apps.otp.service import (
 )
 
 from src.apps.otp.exceptions import (
-    ProblemsWithRedisException,
     IncorrectCodeException,
     CodeNotFoundException,
 )
 
+
 log = logging.getLogger(__name__)
-logging.basicConfig(
-    format=settings.logger.format, 
-    level=settings.logger.log_level,
-)
 
 class Otp:
-    async def send_otp(identifier : str, type_ : str, redis : RedisService) -> list[str]:
+    def __init__(self, redis : RedisService):
+        self.redis = redis
+
+    async def send_otp(self, identifier : str, type_ : str) -> list[str]:
         code, hashed_code = service_generate_code()
         key = "otp:" + str(type_) + ":" + str(identifier)
         try:
-            res = await redis.set(key, hashed_code, ex=500)
+            res = await self.redis.set(key, hashed_code, ex=500)
         
             if not res:
                 log.error(f"send_otp: error with redis, res: {res}")
@@ -38,14 +38,14 @@ class Otp:
         
     
     async def verify_otp(
+        self,
         identifier : str,
         type_ : str,
         code : str,
-        user_id : str,
-        redis : RedisService,
+        user_id : str
     ) -> dict[str, str]:
         try:
-            res = await service_verify_otp(identifier, type_, code, user_id, redis)
+            res = await service_verify_otp(identifier, type_, code, user_id, self.redis)
             return res
         except IncorrectCodeException:
             log.error("incorrect code")

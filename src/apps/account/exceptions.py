@@ -1,6 +1,6 @@
 import grpc
 
-from src.core.db.exceptions import ServiceError
+from src.core.grpc_server.exceptions import ServiceError
 
 
 class EmailAlreadyInUseException(ServiceError):

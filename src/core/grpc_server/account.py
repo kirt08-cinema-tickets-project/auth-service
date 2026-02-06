@@ -5,8 +5,11 @@ from src.core.db.models import UserResponse
 
 from src.apps.account import Account
 
-from src.apps.otp.exceptions import (
+from src.apps.shared.exceptions import(
     ProblemsWithRedisException,
+)
+
+from src.apps.otp.exceptions import (
     IncorrectCodeException,
     CodeNotFoundException,
 )
@@ -20,15 +23,16 @@ from src.apps.account.exceptions import (
 )
 
 class gRPC_Account_Server:
-    def __init__(self):
+    def __init__(self, account : Account):
         self.service = account_pb2_grpc.AccountServiceServicer
+        self.account = account
 
     async def GetAccount(self, request, context):
         """
         request.user_id : int64 -> User
         """
         try:
-            res : UserResponse = await Account.getAccount(request.id)
+            res : UserResponse = await self.account.getAccount(request.id)
             response = account_pb2.GetAccountResponse(
                 id=res.id,
                 phone=res.phone,
@@ -47,7 +51,7 @@ class gRPC_Account_Server:
         request.id : int64
         """
         try:
-            res = await Account.initEmailChange(request.email, request.id)
+            res = await self.account.initEmailChange(request.email, request.id)
             response = account_pb2.InitEmailChangeResponse(
                 ok = True
             )
@@ -66,7 +70,7 @@ class gRPC_Account_Server:
         request.id : int
         """
         try:
-            res = await Account.confirmEmailChange(request.email, request.code, request.id)
+            res = await self.account.confirmEmailChange(request.email, request.code, request.id)
             response = account_pb2.InitEmailChangeResponse(
                 ok = True
             )
@@ -88,7 +92,7 @@ class gRPC_Account_Server:
         request.id : int64
         """
         try:
-            res = await Account.initPhoneChange(request.phone, request.id)
+            res = await self.account.initPhoneChange(request.phone, request.id)
             response = account_pb2.InitPhoneChangeResponse(
                 ok = True
             )
@@ -107,7 +111,7 @@ class gRPC_Account_Server:
         request.id : int
         """
         try:
-            res = await Account.confirmPhoneChange(request.phone, request.code, request.id)
+            res = await self.account.confirmPhoneChange(request.phone, request.code, request.id)
             response = account_pb2.InitPhoneChangeResponse(
                 ok = True
             )

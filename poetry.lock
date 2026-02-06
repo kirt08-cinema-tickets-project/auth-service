@@ -414,14 +414,14 @@ all = ["flake8 (>=7.1.1)", "mypy (>=1.11.2)", "pytest (>=8.3.2)", "ruff (>=0.6.2
 
 [[package]]
 name = "kirt08-contracts"
-version = "0.1.7"
+version = "0.1.8"
 description = ""
 optional = false
 python-versions = "<3.13,>=3.12"
 groups = ["main"]
 files = [
-    {file = "kirt08_contracts-0.1.7-py3-none-any.whl", hash = "sha256:c9caaa783ae169f523968817124724ce610456460198b9369767913af108ece1"},
-    {file = "kirt08_contracts-0.1.7.tar.gz", hash = "sha256:32c1637592be86ad8ec58c0a15da955070bf6f27ee827596dbe2b40eee6eb063"},
+    {file = "kirt08_contracts-0.1.8-py3-none-any.whl", hash = "sha256:0cf2102ebc7cd6de2bfdedbda595484fdbef30ea89aa73bb4e0af12eb952e1af"},
+    {file = "kirt08_contracts-0.1.8.tar.gz", hash = "sha256:ba3da4845d035eb70620151dc98ce98da56fe919fc7a7b9173e899512c258157"},
 ]
 
 [package.dependencies]
