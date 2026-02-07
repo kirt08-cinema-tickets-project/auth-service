@@ -1,8 +1,6 @@
 import logging
 import datetime
 
-from src.core.redis_db.database import get_redis
-
 from src.core.db import DataBase
 from src.core.config import settings
 from src.core.db.models import UserResponse, PendingContactChangesRequest

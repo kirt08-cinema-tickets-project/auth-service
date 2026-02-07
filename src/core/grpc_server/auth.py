@@ -13,6 +13,10 @@ from src.apps.auth.exceptions import (
 
 from src.apps.telegram import Telegram
 
+from src.apps.telegram.exceptions import (
+    TelegramSignatureException,
+)
+
 from src.apps.otp.exceptions import (
     IncorrectCodeException,
     CodeNotFoundException,
@@ -95,14 +99,19 @@ class gRPC_Auth_Server:
         """
         request.query = map<string, string>
         """
-        response = auth_pb2.TelegramVerifyResponse()
-        query_dict = dict(request.query)
-        res : dict[str, str] | str = await self.telegram.telegramVerify(query_dict)
+        try:
+            response = auth_pb2.TelegramVerifyResponse()
+            query_dict = dict(request.query)
+            res : dict[str, str] | str = await self.telegram.telegramVerify(query_dict)
 
-        if isinstance(res, str):
-            response.url = res
-        else:
-            response.access_token = res.get("access_token")
-            response.refresh_token = res.get("refresh_token")
-        return response
+            if isinstance(res, str):
+                response.url = res
+            else:
+                response.tokens.access_token = res.get("access_token")
+                response.tokens.refresh_token = res.get("refresh_token")
+            return response
+        except TelegramSignatureException:
+            await context.abort(TelegramSignatureException.grpc_status, TelegramSignatureException.message)
+        except Exception:
+            await context.abort(grpc.StatusCode.INTERNAL, "Something went wrong...")
         

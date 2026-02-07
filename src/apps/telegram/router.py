@@ -14,6 +14,11 @@ from src.apps.shared.exceptions import (
 
 from src.apps.telegram.service import (
     service_find_user_by_telegramid,
+    service_check_telegram_signature,
+)
+
+from src.apps.telegram.exceptions import (
+    TelegramSignatureException,
 )
 
 
@@ -38,6 +43,10 @@ class Telegram:
         return final_url
     
     async def telegramVerify(self, data : dict[str, str]) -> str | dict[str, str]:
+        isValid = service_check_telegram_signature(data)
+        if not isValid:
+            raise TelegramSignatureException
+
         async with self.db.session() as session:
             exists = await service_find_user_by_telegramid(data.get("id"), session)
             if exists is not None and exists.phone is not None:
@@ -46,10 +55,7 @@ class Telegram:
                     "refresh_token": token.generate_token(exists.id, settings.passport.refresh_ttl)
                 }
             
-        session_id = str(random.randbytes(16).hex())
-        key = "telegram_session:" + session_id
-        res = await self.redis.get(key)
-
+        res = True # not None object
         while res is not None:
             session_id = str(random.randbytes(16).hex())
             key = "telegram_session:" + session_id
