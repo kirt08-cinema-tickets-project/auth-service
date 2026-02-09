@@ -8,15 +8,18 @@ class UserRequest(BaseModel):
     phone : Annotated[str | None, Field(default=None)]
     email : Annotated[str | None, Field(default=None)]
 
-class UserResponse(UserRequest):
+class UserUpdate(UserRequest):
+    is_phone_verified : Annotated[bool | None, Field(default=None)]
+    is_email_verified : Annotated[bool | None, Field(default=None)]
+    role : Annotated[Roles, Field(default=Roles.USER.value)]
+    telegram_id : Annotated[str | None, Field(default=None)]
+
+class UserResponse(UserUpdate):
     model_config = ConfigDict(
         from_attributes=True
     )
 
     id : int
-    is_phone_verified : bool
-    is_email_verified : bool
-    role : Roles
 
     created_at : datetime.datetime
     updated_at : datetime.datetime

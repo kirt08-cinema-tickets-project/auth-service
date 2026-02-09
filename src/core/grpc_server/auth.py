@@ -4,6 +4,8 @@ from kirt08_contracts.auth import auth_pb2, auth_pb2_grpc
 from src.apps.shared.exceptions import (
     UserAlreadyExistsException,
     ProblemsWithRedisException,
+    NotEnoughtDataForUpdateException,
+    UserNotFoundException,
 )
 
 from src.apps.auth import Auth
@@ -15,6 +17,7 @@ from src.apps.telegram import Telegram
 
 from src.apps.telegram.exceptions import (
     TelegramSignatureException,
+    SessionNotFoundException,
 )
 
 from src.apps.otp.exceptions import (
@@ -115,3 +118,35 @@ class gRPC_Auth_Server:
         except Exception:
             await context.abort(grpc.StatusCode.INTERNAL, "Something went wrong...")
         
+    async def TelegramComplete(self, request, context):
+        """
+        request.session_id
+        request.phone
+        """
+        try:
+            response = auth_pb2.TelegramCompleteResponse()
+            res : str = await self.telegram.telegramComplete(request.session_id, request.phone)
+            response.session_id = res
+            return response
+        except SessionNotFoundException:
+           await context.abort(SessionNotFoundException.grpc_status, SessionNotFoundException.message)
+        except UserAlreadyExistsException:
+            await context.abort(UserAlreadyExistsException.grpc_status, UserAlreadyExistsException.message)
+        except NotEnoughtDataForUpdateException:
+            await context.abort(NotEnoughtDataForUpdateException.grpc_status, NotEnoughtDataForUpdateException.message)
+        except UserNotFoundException:
+            await context.abort(UserNotFoundException.grpc_status, UserNotFoundException.message)
+        except Exception:
+            await context.abort(grpc.StatusCode.INTERNAL, "Something went wrong...")
+
+    async def TelegramConsume(self, request, context):
+        try:
+            response = auth_pb2.TelegramConsumeResponse()
+            res : dict[str, str] = await self.telegram.telegramConsume(request.session_id)
+            response.access_token = res.get("access_token")
+            response.refresh_token = res.get("refresh_token")
+            return response
+        except SessionNotFoundException:
+            await context.abort(SessionNotFoundException.grpc_status, SessionNotFoundException.message)
+        except Exception:
+            await context.abort(grpc.StatusCode.INTERNAL, "Something went wrong...")

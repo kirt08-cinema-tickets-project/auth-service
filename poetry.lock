@@ -414,14 +414,14 @@ all = ["flake8 (>=7.1.1)", "mypy (>=1.11.2)", "pytest (>=8.3.2)", "ruff (>=0.6.2
 
 [[package]]
 name = "kirt08-contracts"
-version = "0.1.9"
+version = "0.1.10"
 description = ""
 optional = false
 python-versions = "<3.13,>=3.12"
 groups = ["main"]
 files = [
-    {file = "kirt08_contracts-0.1.9-py3-none-any.whl", hash = "sha256:cd83b46bd0b1946b96984cf93c81c77a74e15feee393da8b022a0d228642aa7d"},
-    {file = "kirt08_contracts-0.1.9.tar.gz", hash = "sha256:47838a2b350724395459a0b0f88a487358a21a40edefe6b45b9393b7e38af10d"},
+    {file = "kirt08_contracts-0.1.10-py3-none-any.whl", hash = "sha256:0ef9b4cfde5eb786024458119a1ba0daaf673162aacf02ec413850aa2e301765"},
+    {file = "kirt08_contracts-0.1.10.tar.gz", hash = "sha256:d5e8ff48670c352425575b18e1534f7af73dded0f757c09d2976aaad4ecce62b"},
 ]
 
 [package.dependencies]
@@ -861,4 +861,4 @@ standard = ["colorama (>=0.4) ; sys_platform == \"win32\"", "httptools (>=0.6.3)
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12, <3.13"
-content-hash = "7138ab75531126bc98c141abcfb32b948520291136272b4085a5968dd3d4896a"
+content-hash = "db26cce329f12367dcbcfb2941fc5494357742fb4c976a3820c86a332bd044bf"

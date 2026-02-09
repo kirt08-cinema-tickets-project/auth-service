@@ -2,9 +2,17 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.db.models.users import UsersORM
-from src.core.db.models.schemas import UserRequest, UserResponse
+from src.core.db.models.schemas import (
+    UserRequest,
+    UserResponse,
+    UserUpdate,
+)
 
-from src.apps.shared.exceptions import UserAlreadyExistsException
+from src.apps.shared.exceptions import (
+    UserAlreadyExistsException,
+    NotEnoughtDataForUpdateException,
+    UserNotFoundException,
+)
 
 
 async def service_find_user_by_id(user_id : int, session : AsyncSession) -> UserResponse:
@@ -84,3 +92,29 @@ async def service_update_user_phone(
     res.is_phone_verified = True
     session.add(res)
     await session.commit()
+
+async def service_user_update(
+    data : UserUpdate,
+    session : AsyncSession
+) -> UserResponse:
+    if data.phone is not None:
+        user_dto : UserResponse = await service_find_user_by_phone(data.phone, session)
+    elif data.email is not None:
+        user_dto : UserResponse = await service_find_user_by_email(data.email, session)
+    else:
+        raise NotEnoughtDataForUpdateException
+    
+    if user_dto is None:
+        raise UserNotFoundException
+    
+    user_from_db = await session.execute(select(UsersORM).filter_by(id = user_dto.id))
+    user_orm: UsersORM = user_from_db.scalar_one()
+
+    update_fields = data.model_dump(exclude_unset=True)
+    for field, value in update_fields.items(): 
+        setattr(user_orm, field, value)
+
+    await session.commit()
+    await session.refresh(user_orm)
+
+    return UserResponse.model_validate(user_orm)

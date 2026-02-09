@@ -8,8 +8,20 @@ from src.core.utils import token
 from src.core.config import settings
 from src.core.redis_db import RedisService
 
+from src.core.db.models.schemas import (
+    UserRequest,
+    UserResponse,
+    UserUpdate,
+)
+
 from src.apps.shared.exceptions import (
     ProblemsWithRedisException,
+)
+
+from src.apps.shared.service import (
+    service_find_user_by_phone,
+    service_create_user,
+    service_user_update,
 )
 
 from src.apps.telegram.service import (
@@ -19,6 +31,7 @@ from src.apps.telegram.service import (
 
 from src.apps.telegram.exceptions import (
     TelegramSignatureException,
+    SessionNotFoundException,
 )
 
 
@@ -51,8 +64,8 @@ class Telegram:
             exists = await service_find_user_by_telegramid(data.get("id"), session)
             if exists is not None and exists.phone is not None:
                 return {
-                    "access_token": token.generate_token(exists.id, settings.passport.access_ttl),
-                    "refresh_token": token.generate_token(exists.id, settings.passport.refresh_ttl)
+                    "access_token": token.generate_token(str(exists.id), settings.passport.access_ttl),
+                    "refresh_token": token.generate_token(str(exists.id), settings.passport.refresh_ttl)
                 }
             
         res = True # not None object
@@ -62,7 +75,7 @@ class Telegram:
             res = await self.redis.get(key)
 
         value = {
-            "telegramID": data.get("id"),
+            "telegram_id": data.get("id"),
             "username": data.get("username")
         }
         try:
@@ -76,3 +89,54 @@ class Telegram:
         
         url = f"https://t.me/{settings.telegram.bot.username}?start={session_id}"
         return url
+    
+    async def telegramComplete(self, session_id: str, phone: str) -> str:
+        key = "telegram_session:" + session_id
+        raw = await self.redis.get(key)
+
+        if raw is None:
+            raise SessionNotFoundException
+        
+        raw = raw.decode("utf-8")
+        data : dict[str, str] = json.loads(raw)
+
+        async with self.db.session() as session:
+            user = await service_find_user_by_phone(phone, session)
+
+            if user is None:
+                new_user = UserRequest(phone = phone)
+                await service_create_user(new_user, session)
+            
+            user_for_update = UserUpdate(
+                                    phone = phone,
+                                    telegram_id=data.get("telegram_id"),
+                                    is_phone_verified=True
+                                )
+            user = await service_user_update(user_for_update, session)
+        
+        tokens = {
+            "access_token": token.generate_token(str(user.id), settings.passport.access_ttl),
+            "refresh_token": token.generate_token(str(user.id), settings.passport.refresh_ttl)
+        }
+        
+        tokens_key = "telegram_tokens:" + session_id
+        await self.redis.set(
+            tokens_key,
+            json.dumps(tokens),
+            120
+        )
+        await self.redis.delete(key)
+        return session_id
+    
+    async def telegramConsume(self, session_id: str) -> dict[str, str]:
+        tokens_key = "telegram_tokens:" + session_id
+        raw = await self.redis.get(tokens_key)
+
+        if raw is None:
+            raise SessionNotFoundException
+        
+        raw = raw.decode("utf-8")
+        tokens : dict[str, str] = json.loads(raw)
+
+        await self.redis.delete(tokens_key)
+        return tokens

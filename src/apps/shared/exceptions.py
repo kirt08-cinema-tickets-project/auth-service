@@ -9,3 +9,9 @@ class UserAlreadyExistsException(ServiceError):
 class ProblemsWithRedisException(ServiceError):
     grpc_status = grpc.StatusCode.UNAVAILABLE
     message = "Redis Error"
+
+class NotEnoughtDataForUpdateException(Exception):
+    pass
+
+class UserNotFoundException(Exception):
+    pass
