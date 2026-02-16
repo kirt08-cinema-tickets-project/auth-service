@@ -9,6 +9,8 @@ from src.core.container import init_objects
 from src.core.grpc_server.auth import gRPC_Auth_Server
 from src.core.grpc_server.account import gRPC_Account_Server
 
+from src.core.rabbitmq.connection import RabbitMQConnection
+from src.core.rabbitmq.publisher import RabbitMQPublisher
 
 log = logging.getLogger(name = __name__)
 logging.basicConfig(
@@ -24,6 +26,16 @@ async def serve():
 
     
     otp, auth, account, telegram = await init_objects()
+
+    print("1")
+    rmq_publisher = RabbitMQPublisher(
+        connection = RabbitMQConnection(
+            url = settings.rmq.url
+        )
+    )
+    await rmq_publisher.start()
+    await rmq_publisher.publish(settings.rmq_queue.notification_queue, 
+                          "Hello world!")
 
     server = grpc.aio.server()
 
