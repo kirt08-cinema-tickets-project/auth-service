@@ -25,6 +25,10 @@ from src.apps.otp.exceptions import (
     CodeNotFoundException,
 )
 
+from src.core.rabbitmq.exceptions import (
+    ProblemsWithRMQException,
+)
+
 
 class gRPC_Auth_Server:
     def __init__(self, auth : Auth, telegram : Telegram):
@@ -46,6 +50,8 @@ class gRPC_Auth_Server:
             await context.abort(ProblemsWithRedisException.grpc_status, ProblemsWithRedisException.message)
         except UserAlreadyExistsException:
             await context.abort(UserAlreadyExistsException.grpc_status, UserAlreadyExistsException.message)
+        except ProblemsWithRMQException:
+            await context.abort(ProblemsWithRMQException.grpc_status, ProblemsWithRMQException.message)
         except Exception as e:
             await context.abort(grpc.StatusCode.INTERNAL, "Something went wrong...")
         

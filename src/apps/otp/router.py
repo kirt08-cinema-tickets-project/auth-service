@@ -14,27 +14,33 @@ from src.apps.otp.exceptions import (
     CodeNotFoundException,
 )
 
+from src.core.rabbitmq import Service_RMQ
+
 
 log = logging.getLogger(__name__)
 
 class Otp:
-    def __init__(self, redis : RedisService):
+    def __init__(self, redis : RedisService, rmq_service: Service_RMQ):
         self.redis = redis
+        self._rmq_service = rmq_service
 
     async def send_otp(self, identifier : str, type_ : str) -> list[str]:
         code, hashed_code = service_generate_code()
         key = "otp:" + str(type_) + ":" + str(identifier)
-        try:
-            res = await self.redis.set(key, hashed_code, ex=500)
         
-            if not res:
-                log.error(f"send_otp: error with redis, res: {res}")
-                raise ProblemsWithRedisException
-            
-            log.info(f"code: {code} with redis res: {res}")
-            return [code, hashed_code]
-        except:
+        res = await self.redis.set(key, hashed_code, ex=500)
+    
+        if not res:
+            log.error(f"send_otp: error with redis, res: {res}")
             raise ProblemsWithRedisException
+        
+        await self._rmq_service.put_otp_code(
+                identifier = identifier,
+                type_ = type_,
+                code = code,
+        )
+        # log.info(f"code: {code} with redis res: {res}")
+        return [code, hashed_code]
         
     
     async def verify_otp(
