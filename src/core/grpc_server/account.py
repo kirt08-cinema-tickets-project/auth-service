@@ -60,8 +60,8 @@ class gRPC_Account_Server:
             await context.abort(EmailAlreadyInUseException.grpc_status, EmailAlreadyInUseException.message)
         except ProblemsWithRedisException:
             await context.abort(ProblemsWithRedisException.grpc_status, ProblemsWithRedisException.message)
-        except Exception as e:
-            await context.abort(grpc.StatusCode.INTERNAL, "Something went wrong ...")
+        # except Exception as e:
+        #     await context.abort(grpc.StatusCode.INTERNAL, "Something went wrong ...")
 
     async def ConfirmEmailChange(self, request, context):
         """

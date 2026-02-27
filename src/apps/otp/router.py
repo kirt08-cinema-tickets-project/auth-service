@@ -62,3 +62,20 @@ class Otp:
         except Exception as e:
             log.error(f"error: {e}")
             raise
+
+    async def send_email_change_otp(self, email: str) -> list[str]:
+        code, hashed_code = service_generate_code()
+        key = "otp:" + "email" + ":" + str(email)
+        
+        res = await self.redis.set(key, hashed_code, ex=500)
+    
+        if not res:
+            log.error(f"send_otp: error with redis, res: {res}")
+            raise ProblemsWithRedisException
+        
+        await self._rmq_service.put_email_change_code(
+            email = email,
+            code = code
+        )
+
+        return [code, hashed_code]

@@ -52,8 +52,8 @@ class gRPC_Auth_Server:
             await context.abort(UserAlreadyExistsException.grpc_status, UserAlreadyExistsException.message)
         except ProblemsWithRMQException:
             await context.abort(ProblemsWithRMQException.grpc_status, ProblemsWithRMQException.message)
-        except Exception as e:
-            await context.abort(grpc.StatusCode.INTERNAL, "Something went wrong...")
+        # except Exception as e:
+        #     await context.abort(grpc.StatusCode.INTERNAL, "Something went wrong...")
         
     
 
@@ -70,8 +70,8 @@ class gRPC_Auth_Server:
             await context.abort(IncorrectCodeException.grpc_status, IncorrectCodeException.message)
         except CodeNotFoundException:
             await context.abort(CodeNotFoundException.grpc_status, CodeNotFoundException.message)
-        except Exception:
-            await context.abort(grpc.StatusCode.INTERNAL, "Something went wrong...")
+        # except Exception:
+        #     await context.abort(grpc.StatusCode.INTERNAL, "Something went wrong...")
 
         response.access_token = res["access_token"]
         response.refresh_token = res["refresh_token"]
@@ -89,8 +89,8 @@ class gRPC_Auth_Server:
             return response
         except TokenException as e:
             await context.abort(e.grpc_status, e.message)
-        except Exception:
-            await context.abort(grpc.StatusCode.INTERNAL, "Something went wrong...")
+        # except Exception:
+        #     await context.abort(grpc.StatusCode.INTERNAL, "Something went wrong...")
 
     async def TelegramInit(self, request, context):
         """

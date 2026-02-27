@@ -6,6 +6,8 @@ from src.core.config import settings
 from src.core.db.models import UserResponse, PendingContactChangesRequest
 from src.core.db.models.utils import Type
 
+from src.core.rabbitmq import Service_RMQ
+
 from src.apps.shared.service import (
     service_find_user_by_id,
     service_find_user_by_email,
@@ -33,10 +35,7 @@ from src.apps.account.service import (
 
 
 log = logging.getLogger(__name__)
-logging.basicConfig(
-    format=settings.logger.format, 
-    level=settings.logger.log_level,
-)
+
 
 class Account:
     def __init__(self, db : DataBase, otp : Otp):
@@ -54,8 +53,8 @@ class Account:
             if user:
                 raise EmailAlreadyInUseException
 
-            code, hashed_code = await self.otp.send_otp(email, "email")
-            
+            code, hashed_code = await self.otp.send_email_change_otp(email)
+
             now = int(datetime.datetime.now(datetime.timezone.utc).timestamp() * 1000)
 
             data = PendingContactChangesRequest(
@@ -81,39 +80,4 @@ class Account:
             await self.otp.verify_otp(email, Type.email.value, code, account_id)
             await service_update_user_email(account_id, email, session)
             await service_delete_PendingChange(account_id, Type.email, session)
-            return True
-        
-    async def initPhoneChange(self, phone : str, account_id : int) -> bool:
-        async with self.db.session() as session:
-            user : UserResponse = await service_find_user_by_phone(phone, session)
-            if user:
-                raise PhoneAlreadyInUseException
-
-            code, hashed_code = await self.otp.send_otp(phone, "phone")
-            
-            now = int(datetime.datetime.now(datetime.timezone.utc).timestamp() * 1000)
-
-            data = PendingContactChangesRequest(
-                type = Type.phone,
-                value = phone,
-                codeHash = hashed_code,
-                expiresAt = now + 5 * 60 * 1000,
-            )
-            res = await service_upsert_PendingChange(account_id, data, session)
-
-            return True
-        
-    async def confirmPhoneChange(self, phone : str, code : str, account_id : int) -> bool:
-        async with self.db.session() as session:
-            try:
-                pending = await service_find_PendingChange(account_id, Type.phone, session)
-            except:
-                raise PendingNotFoundException
-            
-            if pending.value != phone:
-                raise IncorrectPhoneException
-            
-            await self.otp.verify_otp(phone, Type.phone.value, code, account_id)
-            await service_update_user_phone(account_id, phone, session)
-            await service_delete_PendingChange(account_id, Type.phone, session)
             return True

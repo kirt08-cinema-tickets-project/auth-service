@@ -21,10 +21,9 @@ async def init_objects():
         )
     )
     await rmq_publisher.start()
-    rmq_service = Service_RMQ(rmq_publisher)
 
     redis = await get_redis()
-    otp = Otp(redis, rmq_service)
+    otp = Otp(redis, Service_RMQ(rmq_publisher))
 
     auth = Auth(db, otp)
     account = Account(db, otp)
