@@ -7,6 +7,7 @@ from src.core.db import DataBase
 from src.core.utils import token
 from src.core.config import settings
 from src.core.redis_db import RedisService
+from src.core.grpc_client import UsersClient
 
 from src.core.db.models.schemas import (
     UserRequest,
@@ -39,9 +40,10 @@ from src.apps.telegram.exceptions import (
 log = logging.getLogger(__name__)
 
 class Telegram:
-    def __init__(self, db : DataBase, redis : RedisService):
+    def __init__(self, db : DataBase, redis : RedisService, user_client: UsersClient):
         self.db = db
         self.redis = redis
+        self.user_client = user_client
 
     async def telegramInit(self) -> str:
         url = "https://oauth.telegram.org/auth"
@@ -68,6 +70,8 @@ class Telegram:
                     "refresh_token": token.generate_token(str(exists.id), settings.passport.refresh_ttl)
                 }
             
+        await self.user_client.create_user(str(exists.id))
+
         res = True # not None object
         while res is not None:
             session_id = str(random.randbytes(16).hex())

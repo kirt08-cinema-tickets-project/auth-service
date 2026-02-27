@@ -51,15 +51,18 @@ async def service_find_user_by_email(
 async def service_create_user(
     data : UserRequest,
     session : AsyncSession,
-) -> UserResponse:
+) -> UserResponse | None:
     if data.phone is not None:
         user = await service_find_user_by_phone(data.phone, session)
         if user:
-            raise UserAlreadyExistsException
+            return
+            # raise UserAlreadyExistsException
     else:
         user = await service_find_user_by_email(data.email, session)
         if user:
-            raise UserAlreadyExistsException
+            return
+            # raise UserAlreadyExistsException
+        
     user = UsersORM(
         phone = data.phone,
         email = data.email,

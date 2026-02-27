@@ -6,6 +6,8 @@ from src.apps.telegram import Telegram
 from src.core.db import db
 from src.core.redis_db import get_redis
 
+from src.core.grpc_client import UsersClient
+
 from src.core.rabbitmq import (
     RabbitMQConnection,
     RabbitMQPublisher,
@@ -22,10 +24,12 @@ async def init_objects():
     )
     await rmq_publisher.start()
 
+    user_client = UsersClient()
+
     redis = await get_redis()
     otp = Otp(redis, Service_RMQ(rmq_publisher))
 
-    auth = Auth(db, otp)
+    auth = Auth(db, otp, user_client)
     account = Account(db, otp)
-    telegram = Telegram(db, redis)
+    telegram = Telegram(db, redis, user_client)
     return otp, auth, account, telegram

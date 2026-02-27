@@ -56,7 +56,6 @@ class gRPC_Auth_Server:
         #     await context.abort(grpc.StatusCode.INTERNAL, "Something went wrong...")
         
     
-
     async def VerifyOtp(self, request, context):
         """
         request.identifier
@@ -77,6 +76,7 @@ class gRPC_Auth_Server:
         response.refresh_token = res["refresh_token"]
         return response
     
+
     async def Refresh(self, request, context):
         """
         request.refresh_token -> {access_token, refresh_token}
@@ -92,6 +92,7 @@ class gRPC_Auth_Server:
         # except Exception:
         #     await context.abort(grpc.StatusCode.INTERNAL, "Something went wrong...")
 
+
     async def TelegramInit(self, request, context):
         """
         request.Empty -> url
@@ -104,6 +105,7 @@ class gRPC_Auth_Server:
         except Exception:
             await context.abort(grpc.StatusCode.INTERNAL, "Something went wrong...")
     
+
     async def TelegramVerify(self, request, context):
         """
         request.query = map<string, string>
@@ -123,7 +125,8 @@ class gRPC_Auth_Server:
             await context.abort(TelegramSignatureException.grpc_status, TelegramSignatureException.message)
         except Exception:
             await context.abort(grpc.StatusCode.INTERNAL, "Something went wrong...")
-        
+
+
     async def TelegramComplete(self, request, context):
         """
         request.session_id
@@ -144,6 +147,7 @@ class gRPC_Auth_Server:
             await context.abort(UserNotFoundException.grpc_status, UserNotFoundException.message)
         except Exception:
             await context.abort(grpc.StatusCode.INTERNAL, "Something went wrong...")
+
 
     async def TelegramConsume(self, request, context):
         try:

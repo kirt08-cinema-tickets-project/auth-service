@@ -18,3 +18,11 @@ class UsersClient:
         )
         response = await self._stub.GetMe(request)
         return response
+    
+    async def create_user(self, id: str):
+        request = users_pb2.CreateUserRequest(
+            id = id
+        )
+        response = await self._stub.CreateUser(request)
+        return response
+    

@@ -4,8 +4,6 @@ from src.core.redis_db import RedisService
 
 from src.core.rabbitmq import Service_RMQ
 
-from src.core.grpc_client import UsersClient
-
 from src.apps.shared.exceptions import ProblemsWithRedisException
 
 from src.apps.otp.service import (
@@ -25,7 +23,6 @@ class Otp:
     def __init__(self, redis : RedisService, rmq_service: Service_RMQ):
         self.redis = redis
         self._rmq_service = rmq_service
-        self._users_client : UsersClient = UsersClient()
 
     async def send_otp(self, identifier : str, type_ : str) -> list[str]:
         code, hashed_code = service_generate_code()
@@ -54,7 +51,6 @@ class Otp:
         user_id : str
     ) -> dict[str, str]:
         try:
-            await self._users_client.get_me("1")
             res = await service_verify_otp(identifier, type_, code, user_id, self.redis)
             return res
         except IncorrectCodeException:
