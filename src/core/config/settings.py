@@ -4,12 +4,14 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 from src.core.config.rmqConfig import RmqConfig
+from src.core.config.grpcConfig import GrpcConfig
 from src.core.config.redisConfig import RedisConfig
 from src.core.config.dbConfig import DatabaseConfig
 from src.core.config.loggerConfig import LoggerConfig
 from src.core.config.passportConfig import PassportConfig
 from src.core.config.telegramConfig import TelegramConfig
 from src.core.config.rmqQueueConfig import RmqQueueConfig
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
@@ -27,5 +29,6 @@ class Settings(BaseSettings):
     telegram : TelegramConfig = TelegramConfig()
     rmq : RmqConfig = RmqConfig()
     rmq_queue : RmqQueueConfig = RmqQueueConfig()
+    grpc: GrpcConfig = GrpcConfig()
 
 settings = Settings()

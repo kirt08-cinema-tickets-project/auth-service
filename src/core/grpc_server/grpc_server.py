@@ -9,12 +9,6 @@ from src.core.container import init_objects
 from src.core.grpc_server.auth import gRPC_Auth_Server
 from src.core.grpc_server.account import gRPC_Account_Server
 
-from src.core.rabbitmq import (
-    RabbitMQConnection,
-    RabbitMQPublisher,
-    Service_RMQ,
-)
-
 log = logging.getLogger(name = __name__)
 logging.basicConfig(
     format=settings.logger.format, 
@@ -26,7 +20,6 @@ async def serve():
     # await db.create_tables()
     # log.info("Drop Table")
     log.info("Server starting up...")
-
     
     otp, auth, account, telegram = await init_objects()
 
@@ -41,8 +34,9 @@ async def serve():
         gRPC_Account_Server(account),
         server
     )
-
-    server.add_insecure_port("localhost:50051")
+    url = f"{settings.grpc.server.host}:{settings.grpc.server.port}"
+    log.info(url)
+    server.add_insecure_port(url)
     await server.start()
 
     log.info("Server successfully started!")
