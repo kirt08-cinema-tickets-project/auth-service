@@ -16,9 +16,6 @@ logging.basicConfig(
 )
 
 async def serve():
-    # from src.core.db import db
-    # await db.create_tables()
-    # log.info("Drop Table")
     log.info("Server starting up...")
     
     otp, auth, account, telegram = await init_objects()
