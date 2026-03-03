@@ -18,6 +18,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 env_name = os.getenv("ENVIRONMENT", "development").lower()
 env_file = BASE_DIR / f".env.{env_name}.local"
 
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         case_sensitive=False,

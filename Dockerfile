@@ -32,4 +32,3 @@ COPY . .
 ENV ENVIRONMENT=production
 
 CMD ["python", "-m", "src.core.main"]
-

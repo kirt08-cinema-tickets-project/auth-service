@@ -52,8 +52,14 @@ async def service_delete_PendingChange(
     account_id : int,
     type : Type,
     session : AsyncSession,
-) -> int: 
-    return ( await session.execute(delete(PendingContactChangesORM)
-                            .filter_by( account_id = account_id,
-                                        type = type)) )
+): 
+    result = await session.execute(
+            delete(PendingContactChangesORM)
+            .filter_by(
+                account_id = account_id,
+                type = type
+            )
+    )
+    await session.commit()
+    return result
     
