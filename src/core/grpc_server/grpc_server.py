@@ -6,6 +6,7 @@ from kirt08_contracts.account import account_pb2_grpc
 
 from src.core.config import settings
 from src.core.container import init_objects
+from src.core.prometheus import MetricsInterceptor
 from src.core.grpc_server.auth import gRPC_Auth_Server
 from src.core.grpc_server.account import gRPC_Account_Server
 
@@ -20,7 +21,9 @@ async def serve():
     
     otp, auth, account, telegram = await init_objects()
 
-    server = grpc.aio.server()
+    server = grpc.aio.server(
+        interceptors=[MetricsInterceptor()]
+    )
 
     auth_pb2_grpc.add_AuthServiceServicer_to_server(
         gRPC_Auth_Server(auth, telegram),

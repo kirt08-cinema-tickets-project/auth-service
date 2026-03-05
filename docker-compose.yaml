@@ -7,6 +7,10 @@ services:
             dockerfile: Dockerfile
         env_file:
             - .env.production.local
+        # ports:
+        #   - "9101:9101"
+        expose:
+           - "9101"
         networks:
             - kirt08
 
