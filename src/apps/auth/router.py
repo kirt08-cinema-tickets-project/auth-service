@@ -35,7 +35,10 @@ class Auth:
                 data.phone = identifier
             else:
                 data.email = identifier
-            res = await service_create_user(data, session)
+            try:
+                res = await service_create_user(data, session)
+            except Exception as e:
+                log.info(e)
 
         res = await self.otp.send_otp(identifier, type_)
         return True

@@ -10,11 +10,8 @@ from src.core.prometheus import MetricsInterceptor
 from src.core.grpc_server.auth import gRPC_Auth_Server
 from src.core.grpc_server.account import gRPC_Account_Server
 
+
 log = logging.getLogger(name = __name__)
-logging.basicConfig(
-    format=settings.logger.format, 
-    level=settings.logger.log_level   
-)
 
 async def serve():
     log.info("Server starting up...")
